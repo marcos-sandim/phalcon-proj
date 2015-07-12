@@ -4,12 +4,13 @@ defined('APP_PATH') || define('APP_PATH', realpath('.'));
 
 return new \Phalcon\Config(array(
     'database' => array(
-        'adapter'     => 'Mysql',
+        'adapter'     => 'Postgresql',
         'host'        => 'localhost',
-        'username'    => 'root',
-        'password'    => '',
-        'dbname'      => 'test',
-        'charset'     => 'utf8',
+        'username'    => 'vgpg_user',
+        'password'    => 'q1w2e3',
+        'dbname'      => 'vgpg_cms',
+        'schema'      => 'public',
+        'port'        => '5432',
     ),
     'application' => array(
         'controllersDir' => APP_PATH . '/app/controllers/',
@@ -17,8 +18,9 @@ return new \Phalcon\Config(array(
         'migrationsDir'  => APP_PATH . '/app/migrations/',
         'viewsDir'       => APP_PATH . '/app/views/',
         'pluginsDir'     => APP_PATH . '/app/plugins/',
-        'libraryDir'     => APP_PATH . '/app/library/',
         'cacheDir'       => APP_PATH . '/app/cache/',
-        'baseUri'        => '/myproj/',
+        'formsDir'       => APP_PATH . '/app/forms/',
+        'libraryDir'     => APP_PATH . '/library/',
+        'baseUri'        => '/',
     )
 ));

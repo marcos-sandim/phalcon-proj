@@ -1,11 +1,11 @@
 <?php
 
-class IndexController extends ControllerBase
+class IndexController extends \Library\Acl\ControllerBase
 {
 
     public function indexAction()
     {
-
+        $this->view->setLayout('public');
     }
 
 }

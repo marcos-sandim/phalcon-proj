@@ -8,10 +8,12 @@
 use Phalcon\Di\FactoryDefault;
 use Phalcon\Mvc\View;
 use Phalcon\Mvc\Url as UrlResolver;
-use Phalcon\Db\Adapter\Pdo\Mysql as DbAdapter;
+use Phalcon\Db\Adapter\Pdo as DbPdo;
 use Phalcon\Mvc\View\Engine\Volt as VoltEngine;
 use Phalcon\Mvc\Model\Metadata\Memory as MetaDataAdapter;
 use Phalcon\Session\Adapter\Files as SessionAdapter;
+
+use Phalcon\Flash\Direct as Flash;
 
 /**
  * The FactoryDefault Dependency Injector automatically register the right services providing a full stack framework
@@ -35,16 +37,17 @@ $di->setShared('view', function () use ($config) {
 
     $view = new View();
 
-    $view->setViewsDir($config->application->viewsDir);
-
-    $view->registerEngines(array(
+    $view->setViewsDir($config->application->viewsDir)
+        ->setLayout('main')
+        ->registerEngines(array(
         '.volt' => function ($view, $di) use ($config) {
 
             $volt = new VoltEngine($view, $di);
 
             $volt->setOptions(array(
                 'compiledPath' => $config->application->cacheDir,
-                'compiledSeparator' => '_'
+                'compiledSeparator' => '_',
+                'compileAlways' => true
             ));
 
             return $volt;
@@ -59,7 +62,17 @@ $di->setShared('view', function () use ($config) {
  * Database connection is created based in the parameters defined in the configuration file
  */
 $di->set('db', function () use ($config) {
-    return new DbAdapter($config->database->toArray());
+    $dbConfig = $config->database->toArray();
+    $dbAdapterName = $dbConfig['adapter'];
+    unset($dbConfig['adapter']);
+    switch ($dbAdapterName) {
+        case 'Postgresql':
+            return new DbPdo\Postgresql($dbConfig);
+            break;
+        case 'Mysql':
+            return new DbPdo\Mysql($dbConfig);
+            break;
+    }
 });
 
 /**
@@ -77,4 +90,33 @@ $di->setShared('session', function () {
     $session->start();
 
     return $session;
+});
+
+/**
+ * Flash service with custom CSS classes
+ */
+$di->set('flash', function () {
+    return new Flash(array(
+        'error' => 'alert alert-danger',
+        'success' => 'alert alert-success',
+        'notice' => 'alert alert-info',
+        'warning' => 'alert alert-warning'
+    ));
+});
+
+/**
+ * Custom authentication component
+ */
+$di->set('auth', function () {
+    return new \Library\Auth\Auth();
+});
+
+/**
+ * Custom ACL component
+ */
+$di->set('acl', function() {
+    $acl = new \Library\Acl\Adapter(array());
+    // Default action is deny access
+    $acl->setDefaultAction(Phalcon\Acl::DENY);
+    return $acl;
 });

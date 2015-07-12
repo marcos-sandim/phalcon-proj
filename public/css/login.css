@@ -1,0 +1,18 @@
+html {
+  background: url(/img/login_bg.png) no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.login-box {
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  max-width: 350px;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  max-height: 320px;
+}
