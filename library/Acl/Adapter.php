@@ -143,8 +143,7 @@ class Adapter extends \Phalcon\Acl\Adapter implements \Phalcon\Acl\AdapterInterf
     public function isPrivate($resourceName)
     {
         $resource = \App\Models\Resource::findFirstByName($resourceName);
-
-        return $resource && !$resource->is_public;
+        return !$resource || !$resource->is_public;
     }
 
     /**
@@ -334,7 +333,7 @@ class Adapter extends \Phalcon\Acl\Adapter implements \Phalcon\Acl\AdapterInterf
      *
      * @return bool
      */
-    public function isAllowed($role, $resourceName, $actionName)
+    public function isAllowed($role, $controllerName, $actionName)
     {
         /*$sql = implode(' ', array(
             'SELECT allowed FROM', $this->options['accessList'], 'AS a',
@@ -363,8 +362,9 @@ class Adapter extends \Phalcon\Acl\Adapter implements \Phalcon\Acl\AdapterInterf
             return (bool) $allowed[0];
         }*/
 
+        $resourceName = $actionName ? "$controllerName:$actionName" : $controllerName;
         $user = \App\Models\User::findFirstById($role);
-        $resource = \App\Models\Resource::findFirstByName("$resourceName:$actionName");
+        $resource = \App\Models\Resource::findFirstByName($resourceName);
 
         foreach ($user->Group as $group) {
             if ($group->is_admin) {

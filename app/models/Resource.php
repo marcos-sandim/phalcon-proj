@@ -1,7 +1,7 @@
 <?php
 namespace App\Models;
 
-class Resource extends \Phalcon\Mvc\Model
+class Resource extends \Library\Model\Base
 {
 
     /**

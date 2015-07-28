@@ -1,8 +1,6 @@
 <?php
-
 namespace App\Forms\User;
 
-use \Library\Forms\Base;
 use \Phalcon\Forms\Element\Text;
 //use \Phalcon\Forms\Element\Select;
 use \Phalcon\Forms\Element\Password;
@@ -14,11 +12,23 @@ use Phalcon\Validation\Validator\PresenceOf as PresenceOfValidador;
 use Phalcon\Validation\Validator\StringLength as StringLengthValidador;
 use Phalcon\Validation\Validator\Confirmation as ConfirmationValidador;
 
-class Manage extends Base
+use \Library\Forms\Decorator\Bootstrap as BootstrapDecorator;
+
+class Manage extends \Library\Forms\Base
 {
-    public function __construct()
+    protected $_user;
+
+    public function __construct($user = null)
     {
         parent::__construct();
+
+        $this->_user = $user;
+
+        if ($this->_user) {
+            $this->setAction('/user/edit/' . $this->_user->id);
+        } else {
+            $this->setAction('/user/create');
+        }
 
         $this->_viewScript = 'forms/user/manage';
         $this->_initForm();
@@ -27,60 +37,66 @@ class Manage extends Base
     private function _initForm()
     {
         $element = new Text('name');
-        $element->setLabel('Name')
+        $element->setLabel($this->translate->_('USER MANAGE FORM NAME LABEL'))
             ->setAttribute('class', 'form-control')
-            ->setAttribute('size', 30);
+            ->setUserOption('decorator', new BootstrapDecorator(array('style' => BootstrapDecorator::VERTICAL)))
+            ->setDefault($this->_user ? $this->_user->name : null);
         $this->add($element);
 
         $element = new Text('email');
-        $element->setLabel('Email')
+        $element->setLabel($this->translate->_('USER MANAGE FORM EMAIL LABEL'))
             ->setAttribute('class', 'form-control')
-            ->addValidator(new EmailValidator());
+            ->addValidator(new EmailValidator())
+            ->setUserOption('decorator', new BootstrapDecorator(array('style' => BootstrapDecorator::VERTICAL)))
+            ->setDefault($this->_user ? $this->_user->email : null);
         $this->add($element);
 
         $element = new Text('role');
-        $element->setLabel('Role')
+        $element->setLabel($this->translate->_('USER MANAGE FORM ROLE LABEL'))
             ->setAttribute('class', 'form-control')
-            ->setAttribute('size', 30);
+            ->setUserOption('decorator', new BootstrapDecorator(array('style' => BootstrapDecorator::VERTICAL)))
+            ->setDefault($this->_user ? $this->_user->role : null);
         $this->add($element);
 
         $element = new Text('phone');
-        $element->setLabel('Phone')
+        $element->setLabel($this->translate->_('USER MANAGE FORM PHONE LABEL'))
             ->setAttribute('class', 'form-control')
-            ->setAttribute('size', 30);
+            ->setUserOption('decorator', new BootstrapDecorator(array('style' => BootstrapDecorator::VERTICAL)))
+            ->setDefault($this->_user ? $this->_user->phone : null);
         $this->add($element);
 
-        $element = new Password('password');
-
-        $element->setLabel('Password')
-            ->addValidators(array(
-                new PresenceOfValidador(array(
-                    'message' => 'The password is required'
-                )),
-                new StringLengthValidador(array(
-                    'min' => 8,
-                    'messageMinimum' => 'Password is too short. Minimum 8 characters'
-                )),
-                new ConfirmationValidador(array(
-                    'message' => 'Password doesn\'t match confirmation',
-                    'with' => 'confirmPassword'
+        if (!$this->_user) {
+            $element = new Password('password');
+            $element->setLabel($this->translate->_('USER MANAGE FORM PASSWORD LABEL'))
+                ->addValidators(array(
+                    new PresenceOfValidador(array(
+                        'message' => 'The password is required'
+                    )),
+                    new StringLengthValidador(array(
+                        'min' => 8,
+                        'messageMinimum' => 'Password is too short. Minimum 8 characters'
+                    )),
+                    new ConfirmationValidador(array(
+                        'message' => 'Password doesn\'t match confirmation',
+                        'with' => 'confirmPassword'
+                    ))
                 ))
-            ))
-            ->setAttribute('class', 'form-control');
-        $this->add($element);
+                ->setAttribute('class', 'form-control')
+                ->setUserOption('decorator', new BootstrapDecorator(array('style' => BootstrapDecorator::VERTICAL)));
+            $this->add($element);
 
-        // Confirm Password
-        $element = new Password('confirmPassword');
-
-        $element->setLabel('Confirm Password')
-            ->addValidators(array(
-                new PresenceOfValidador(array(
-                    'message' => 'The confirmation password is required'
+            // Confirm Password
+            $element = new Password('confirmPassword');
+            $element->setLabel($this->translate->_('USER MANAGE FORM CONFIRM PASSWORD LABEL'))
+                ->addValidators(array(
+                    new PresenceOfValidador(array(
+                        'message' => 'The confirmation password is required'
+                    ))
                 ))
-            ))
-            ->setAttribute('class', 'form-control');
-        $this->add($element);
-
+                ->setAttribute('class', 'form-control')
+                ->setUserOption('decorator', new BootstrapDecorator(array('style' => BootstrapDecorator::VERTICAL)));
+            $this->add($element);
+        }
         /*$this->add(new Text('telephone'));
 
         $this->add(new Select('telephoneType', array(
@@ -92,7 +108,7 @@ class Manage extends Base
         $element = new Submit('submit', array(
             'class' => 'btn btn-success pull-right'
         ));
-        $element->setLabel('Sign up');
+        $element->setDefault($this->translate->_('USER MANAGE FORM SUBMIT BUTTON LABEL'));
         $this->add($element);
     }
 

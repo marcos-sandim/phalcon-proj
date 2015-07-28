@@ -27,14 +27,16 @@ class Auth extends Component
         $user = \App\Models\User::findFirstByEmail($credentials['email']);
         if ($user == false) {
             //$this->registerUserThrottling(0);
-            throw new Exception('Wrong email/password combination');
+            //throw new Exception('Wrong email/password combination');
+            return false;
         }
 
         // Check the password
         //if (!$this->security->checkHash($credentials['password'], $user->password)) {
         if ($user->crypt_hash != sha1($credentials['password'] . $user->password_salt)) {
             //$this->registerUserThrottling($user->id);
-            throw new Exception('Wrong email/password combination');
+            //throw new Exception('Wrong email/password combination');
+            return false;
         }
 
         // Check if the user was flagged
@@ -53,6 +55,7 @@ class Auth extends Component
             'name' => $user->name,
             //'profile' => $user->profile->name
         ));
+        return true;
     }
 
     /**

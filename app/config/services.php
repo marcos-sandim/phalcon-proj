@@ -50,6 +50,33 @@ $di->setShared('view', function () use ($config) {
                 'compileAlways' => true
             ));
 
+            $compiler = $volt->getCompiler();
+
+            $compiler->addFunction('_', function($resolvedArgs, $exprArgs) {
+                    return '$this->translate->_(' . $resolvedArgs .')';
+                })
+                ->addFunction('acl_link', function($resolvedArgs, $exprArgs) use ($compiler) {
+                    $parameters = $compiler->expression($exprArgs[0]['expr']);
+
+                    if (isset($exprArgs[1])) {
+                        $text = $compiler->expression($exprArgs[1]['expr']);
+                    } else {
+                        $text = 'null';
+                    }
+                    if (isset($exprArgs[2])) {
+                        $args = $compiler->expression($exprArgs[2]['expr']);
+                    } else {
+                        $args = 'array()';
+                    }
+
+                    return "\Library\Acl\Link::make($parameters, $text, $args)";
+                })
+                ->addFunction('ceil', 'ceil')
+                ->addFunction('floor', 'floor')
+                ->addFilter('int', function ($resolvedArgs, $exprArgs) {
+                    return 'intval(' . $resolvedArgs . ')';
+                });
+
             return $volt;
         },
         '.phtml' => 'Phalcon\Mvc\View\Engine\Php'
@@ -120,3 +147,33 @@ $di->set('acl', function() {
     $acl->setDefaultAction(Phalcon\Acl::DENY);
     return $acl;
 });
+
+/**
+ * Translation component
+ */
+$di->set('translate', function() use($di, $config) {
+    // Now we're getting the best language for the user
+    $current_lang = $di->get('dispatcher')->getParam('lang', null, $di->get('request')->getBestLanguage());
+
+    //Check if we have a translation file for that lang
+    if (file_exists($config->application->messagesDir . $current_lang . '.php')) {
+        $messages = require $config->application->messagesDir . $current_lang . '.php';
+    } else {
+        // fallback to some default
+        $messages = require $config->application->messagesDir . 'en.php';
+    }
+
+    //Return a translation object
+    return new \Phalcon\Translate\Adapter\NativeArray(array(
+        "content" => $messages
+    ));
+});
+
+/**
+ * Custom Menu
+ */
+$di->set('menu', function() use($config) {
+    $menu = require $config->application->menu;
+    return $menu;
+});
+

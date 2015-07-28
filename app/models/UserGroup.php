@@ -1,7 +1,7 @@
 <?php
 namespace App\Models;
 
-class UserGroup extends \Phalcon\Mvc\Model
+class UserGroup extends \Library\Model\Base
 {
 
     /**

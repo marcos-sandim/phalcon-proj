@@ -1,7 +1,7 @@
 <?php
 namespace App\Models;
 
-class GroupResource extends \Phalcon\Mvc\Model
+class GroupResource extends \Library\Model\Base
 {
 
     /**

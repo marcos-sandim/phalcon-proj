@@ -1,0 +1,41 @@
+.logo img.logo-lg {
+    height: 40px;
+}
+
+.no-padding {
+    padding: 0 !important;
+}
+
+.no-margin-bottom {
+    margin-bottom: 0;
+}
+
+.panel .panel-heading .panel-title {
+    display: inline-block;
+}
+
+table.no-box {
+    border-collapse: collapse;
+    border: 0;
+}
+table.no-box tr:first-child th {
+    border-top: 0;
+}
+table.no-box tr:last-child td {
+    border-bottom: 0;
+}
+table.no-box tr td:first-child,
+table.no-box tr th:first-child {
+    border-left: 0;
+}
+table.no-box tr td:last-child,
+table.no-box tr th:last-child {
+    border-right: 0;
+}
+
+.pagination-count {
+    float: left;
+    margin: 20px 15px 20px 0;
+    line-height: 30px;
+    display: block;
+}

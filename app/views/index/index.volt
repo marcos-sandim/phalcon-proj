@@ -1,3 +1,4 @@
+{{content()}}
 <!-- Navigation -->
 <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container">
@@ -9,7 +10,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            {{ link_to('/', '<img class="logo" src="img/logo_h.png" alt="VGPG"></img>', 'class': 'navbar-brand') }}
+            {{ link_to('/', '<img class="logo" src="/img/logo_h.png" alt="VGPG"></img>', 'class': 'navbar-brand') }}
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -177,32 +178,32 @@
         </div>
         <div class="col-md-4 col-sm-6">
             <a href="portfolio-item.html">
-                <img class="img-responsive img-portfolio img-hover" src="img/portfolio_1.jpg" alt="">
+                <img class="img-responsive img-portfolio img-hover" src="/img/portfolio_1.jpg" alt="">
             </a>
         </div>
         <div class="col-md-4 col-sm-6">
             <a href="portfolio-item.html">
-                <img class="img-responsive img-portfolio img-hover" src="img/portfolio_2.png" alt="">
+                <img class="img-responsive img-portfolio img-hover" src="/img/portfolio_2.png" alt="">
             </a>
         </div>
         <div class="col-md-4 col-sm-6">
             <a href="portfolio-item.html">
-                <img class="img-responsive img-portfolio img-hover" src="img/portfolio_3.png" alt="">
+                <img class="img-responsive img-portfolio img-hover" src="/img/portfolio_3.png" alt="">
             </a>
         </div>
         <div class="col-md-4 col-sm-6">
             <a href="portfolio-item.html">
-                <img class="img-responsive img-portfolio img-hover" src="img/portfolio_4.png" alt="">
+                <img class="img-responsive img-portfolio img-hover" src="/img/portfolio_4.png" alt="">
             </a>
         </div>
         <div class="col-md-4 col-sm-6">
             <a href="portfolio-item.html">
-                <img class="img-responsive img-portfolio img-hover" src="img/portfolio_5.png" alt="">
+                <img class="img-responsive img-portfolio img-hover" src="/img/portfolio_5.png" alt="">
             </a>
         </div>
         <div class="col-md-4 col-sm-6">
             <a href="portfolio-item.html">
-                <img class="img-responsive img-portfolio img-hover" src="img/portfolio_6.png" alt="">
+                <img class="img-responsive img-portfolio img-hover" src="/img/portfolio_6.png" alt="">
             </a>
         </div>
     </div>

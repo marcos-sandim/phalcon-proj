@@ -1,2 +1,2 @@
-<h1>Create user</h1>
+<h1>{{ _('USER CREATE TITLE') }}</h1>
 {{ form }}

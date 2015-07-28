@@ -11,6 +11,8 @@ use Phalcon\Validation\Validator\PresenceOf;
 use Phalcon\Validation\Validator\Email as EmailValidator;
 use Phalcon\Validation\Validator\Identical;
 
+use \Library\Forms\Decorator\Bootstrap as BootstrapDecorator;
+
 class Login extends \Library\Forms\Base
 {
     public function __construct()
@@ -18,6 +20,7 @@ class Login extends \Library\Forms\Base
         parent::__construct();
 
         $this->_viewScript = 'forms/session/login';
+        $this->setAction('/session/login');
         $this->_initForm();
     }
 
@@ -25,48 +28,59 @@ class Login extends \Library\Forms\Base
     {
         // Email
         $element = new Email('email', array(
-            'placeholder' => 'Email',
-            'class' => 'form-control'
+            'placeholder' => $this->translate->_('SESSION LOGIN FORM EMAIL LABEL')
         ));
         $element->addValidators(array(
-                new PresenceOf(array(
-                    'message' => 'The e-mail is required'
-                )),
-                new EmailValidator(array(
-                    'message' => 'The e-mail is not valid'
-                ))
-            ));
+            new PresenceOf(array(
+                'message' => 'FORM ERROR MESSAGE REQUIRED FIELD'
+            )),
+            new EmailValidator(array(
+                'message' => 'FORM ERROR MESSAGE INVALID EMAIL'
+            ))
+        ))
+        ->setAttribute('class', 'form-control')
+        ->setUserOption('decorator',
+            new \Library\Forms\Decorator\Bootstrap(array(
+                'feedback' => '<span class="glyphicon glyphicon-envelope form-control-feedback"></span>',
+                'style' => BootstrapDecorator::VERTICAL,
+            )));
         $this->add($element);
 
         // Password
         $element = new Password('password', array(
-            'placeholder' => 'Password'
+            'placeholder' => $this->translate->_('SESSION LOGIN FORM PASSWORD LABEL')
         ));
         $element->addValidator(new PresenceOf(array(
-                'message' => 'The password is required'
-            )))
-            ->setAttribute('class', 'form-control');
+            'message' => 'FORM ERROR MESSAGE REQUIRED FIELD'
+        )))
+        ->setAttribute('class', 'form-control')
+        ->setUserOption('decorator',
+            new \Library\Forms\Decorator\Bootstrap(array(
+                'feedback' => '<span class="glyphicon glyphicon-lock form-control-feedback"></span>',
+                'style' => BootstrapDecorator::VERTICAL,
+        )));
         $this->add($element);
 
         // Remember
         $element = new Check('remember', array(
             'value' => 'yes'
         ));
-        $element->setLabel('Remember me');
+        $element->setLabel($this->translate->_('SESSION LOGIN FORM REMEMBER ME LABEL'));
         $this->add($element);
 
         // CSRF
         $element = new Hidden('csrf');
         $element->addValidator(new Identical(array(
-            'value' => $this->security->getSessionToken(),
-            'message' => 'CSRF validation failed'
-        )));
+                'value' => $this->security->getSessionToken(),
+                'message' => 'CSRF validation failed'
+            )))
+            ->setDefault($this->security->getSessionToken());
         $this->add($element);
 
         $element = new Submit('login', array(
-            'class' => 'btn btn-success pull-right'
+            'class' => 'btn btn-primary btn-block btn-flat'
         ));
-        $element->setLabel('Login');
+        $element->setDefault($this->translate->_('SESSION LOGIN FORM LOGIN BUTTON LABEL'));
         $this->add($element);
     }
 }

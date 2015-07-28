@@ -112,12 +112,12 @@ class User extends \Library\Model\Base
     public function initialize()
     {
         $this->setSchema('public');
-        $this->hasMany('id', 'CmsPage', 'creator_id', array('alias' => 'CmsPage'));
-        $this->hasMany('id', 'TranslationComment', 'user_id', array('alias' => 'TranslationComment'));
-        $this->hasMany('id', 'TranslationLanguageUser', 'user_id', array('alias' => 'TranslationLanguageUser'));
-        $this->hasMany('id', 'TranslationValue', 'translator_id', array('alias' => 'TranslationValue'));
-        $this->hasMany('id', 'TranslationValue', 'approved_by_id', array('alias' => 'TranslationValue'));
-        $this->hasMany('id', 'UserGroup', 'user_id', array('alias' => 'UserGroup'));
+//        $this->hasMany('id', 'CmsPage', 'creator_id', array('alias' => 'CmsPage'));
+//        $this->hasMany('id', 'TranslationComment', 'user_id', array('alias' => 'TranslationComment'));
+//        $this->hasMany('id', 'TranslationLanguageUser', 'user_id', array('alias' => 'TranslationLanguageUser'));
+//        $this->hasMany('id', 'TranslationValue', 'translator_id', array('alias' => 'TranslationValue'));
+//        $this->hasMany('id', 'TranslationValue', 'approved_by_id', array('alias' => 'TranslationValue'));
+//        $this->hasMany('id', 'UserGroup', 'user_id', array('alias' => 'UserGroup'));
         $this->hasManyToMany('id', '\App\Models\UserGroup', 'user_id', 'group_id', '\App\Models\Group','id', array('alias' => 'Group'));
     }
 

@@ -1,56 +1,62 @@
 {{ content() }}
 
-<div align="right">
-    {{ link_to('/user/create', '<i class="fa fa-plus"></i> Create user', 'class': 'btn btn-success') }}
+<div class="box">
+    <div class="box-header">
+        <!--<h3 class="panel-title">Panel title</h3> -->
+        {{ acl_link(['controller': 'user', 'action': 'create'], '<i class="fa fa-plus"></i> Create user', ['class': 'btn btn-success btn-xs pull-right']) }}
+        <div class="clearfix"></div>
+    </div>
+    <div class="box-body no-padding">
+        <table class="table table-bordered table-hover no-border-bottom">
+            <thead>
+                <tr>
+                    <th class="text-center">{{ _('USER LIST NAME HEADER') }}</th>
+                    <th class="text-center">{{ _('USER LIST EMAIL HEADER') }}</th>
+                    <th class="text-center">{{ _('USER LIST ROLE HEADER') }}</th>
+                    <th class="text-center">{{ _('USER LIST PHONE HEADER') }}</th>
+                    <th class="text-center">{{ _('USER LIST ACTIVE HEADER') }}</th>
+                    <th class="text-center">{{ _('USER LIST ACTIONS HEADER') }}</th>
+                 </tr>
+            </thead>
+            <tbody>
+            {% for user in page.items %}
+                <tr>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.role }}</td>
+                    <td>{{ user.phone }}</td>
+                    <td class="text-center">
+                        {% if user.active %}
+                            <span class="label label-success">{{ _('USER LIST ACTIVE LABEL') }}</span>
+                        {% else %}
+                            <span class="label label-danger">{{ _('USER LIST INACTIVE LABEL') }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        <div class="dropdown">
+                            <button type="button" data-toggle="dropdown" class="btn btn-default btn-sm">
+                                <i class="fa fa-cog"></i>
+                            </button>
+                            <ul class="dropdown-menu pull-right" aria-labelledby="dLabel">
+                                <li>{{ acl_link(['controller': 'user', 'action': 'edit', user.id], '<i class="fa fa-pencil"></i> ' ~ _('USER LIST EDIT ACTION LABEL')) }}</li>
+                                <li>{{ acl_link(['controller': 'user', 'action': 'deactivate', user.id], '<i class="fa fa-remove"></i> ' ~ _('USER LIST DEACTIVATE ACTION LABEL')) }}</li>
+                                <li>{{ acl_link(['controller': 'user', 'action': 'reactivate', user.id], '<i class="fa fa-check"></i> ' ~ _('USER LIST REACTIVATE ACTION LABEL')) }}</li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="99">{{ _('USER LIST NO USERS MESSAGE') }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="box-footer clearfix">
+        {{ partial('_pagination', ['paginator': page]) }}
+    </div>
 </div>
 
-<div class="table-responsive">
-    <table class="table table-bordered table-hover">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Phone</th>
-                <th>Active</th>
-                <th>Actions</th>
-             </tr>
-        </thead>
-        <tbody>
-        {% for user in page.items %}
-            <tr>
-                <td>{{ user.name }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.role }}</td>
-                <td>{{ user.phone }}</td>
-                <td>{{ user.active }}</td>
-                <td>
-                    {{ link_to("users/edit/" ~ user.id, '<i class="icon-pencil"></i> Edit', "class": "btn btn-default") }}
-                    {{ link_to("users/delete/" ~ user.id, '<i class="icon-remove"></i> Delete', "class": "btn btn-danger") }}
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="99">No users</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
-<table>
-    <tbody>
-        <tr>
-            <td colspan="2" align="right">
-                <table align="center">
-                    <tr>
-                        <td>{{ link_to("user/search", "First") }}</td>
-                        <td>{{ link_to("user/search?page=" ~ page.before, "Previous") }}</td>
-                        <td>{{ link_to("user/search?page=" ~ page.next, "Next") }}</td>
-                        <td>{{ link_to("user/search?page=" ~ page.last, "Last") }}</td>
-                        <td> {{page.current ~ '/' ~ page.total_pages }}</td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </tbody>
-</table>
+
+

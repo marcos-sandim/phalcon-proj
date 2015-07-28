@@ -1,44 +1,45 @@
 <?php
 
 use Phalcon\Mvc\Model\Criteria;
-use Phalcon\Paginator\Adapter\Model as Paginator;
+use Phalcon\Paginator\Adapter\QueryBuilder as Paginator;
 
+/**
+ * User controller
+ *
+ * @AclName("APP ACL USER CONTROLLER NAME")
+ * @AclDesc("APP ACL USER CONTROLLER DESC")
+ */
 class UserController extends \Library\Acl\ControllerBase
 {
 
     /**
-     * Index action
+     * User index actio
+     *
+     * @AclName("APP ACL USER INDEX ACTION NAME")
+     * @AclDesc("APP ACL USER INDEX ACTION DESC")
      */
     public function indexAction()
     {
         //$this->persistent->parameters = null;
-
-        $numberPage = 1;
-        if ($this->request->isPost()) {
+        $this->view->page_title = $this->translate->_('USER LIST TITLE');
+        $numberPage = $this->request->getQuery("page", "int");
+        /*if ($this->request->isPost()) {
             $query = Criteria::fromInput($this->di, "User", $_POST);
             $this->persistent->parameters = $query->getParams();
-        } else {
-            $numberPage = $this->request->getQuery("page", "int");
         }
 
         $parameters = $this->persistent->parameters;
         if (!is_array($parameters)) {
             $parameters = array();
-        }
-        $parameters["order"] = "name";
+        }*/
 
-        $user = \App\Models\User::find($parameters);
-        if (count($user) == 0) {
-            $this->flash->notice("The search did not find any user");
+        $builder = $this->modelsManager->createBuilder()
+                   ->columns(array('u.id', 'u.name', 'u.email', 'u.role', 'u.phone', 'u.active'))
+                   ->from(array('u' => '\App\Models\User'))
+                   ->orderBy(array('u.active', 'u.name'));
 
-            return $this->dispatcher->forward(array(
-                "controller" => "user",
-                "action" => "index"
-            ));
-        }
-
-        $paginator = new Paginator(array(
-            "data" => $user,
+        $paginator = new Phalcon\Paginator\Adapter\QueryBuilder(array(
+            "builder" => $builder,
             "limit"=> 20,
             "page" => $numberPage
         ));
@@ -47,45 +48,10 @@ class UserController extends \Library\Acl\ControllerBase
     }
 
     /**
-     * Edits a user
-     *
-     * @param string $id
-     */
-    public function editAction($id)
-    {
-
-        if (!$this->request->isPost()) {
-
-            $user = User::findFirstByid($id);
-            if (!$user) {
-                $this->flash->error("user was not found");
-
-                return $this->dispatcher->forward(array(
-                    "controller" => "user",
-                    "action" => "index"
-                ));
-            }
-
-            $this->view->id = $user->id;
-
-            $this->tag->setDefault("id", $user->id);
-            $this->tag->setDefault("name", $user->name);
-            $this->tag->setDefault("email", $user->email);
-            $this->tag->setDefault("role", $user->role);
-            $this->tag->setDefault("phone", $user->phone);
-            $this->tag->setDefault("crypt_hash", $user->crypt_hash);
-            $this->tag->setDefault("picture", $user->picture);
-            $this->tag->setDefault("password_salt", $user->password_salt);
-            $this->tag->setDefault("active", $user->active);
-            $this->tag->setDefault("forgot_password_hash", $user->forgot_password_hash);
-            $this->tag->setDefault("created_at", $user->created_at);
-            $this->tag->setDefault("updated_at", $user->updated_at);
-
-        }
-    }
-
-    /**
      * Creates a new user
+     *
+     * @AclName("APP ACL USER CREATE ACTION NAME")
+     * @AclDesc("APP ACL USER CREATE ACTION DESC")
      */
     public function createAction()
     {
@@ -98,7 +64,7 @@ class UserController extends \Library\Acl\ControllerBase
             if ($form->isValid($data)) {
                 $user = new App\Models\User();
 
-                $salt = mcrypt_create_iv(16, MCRYPT_DEV_URANDOM);
+                $salt = md5(mcrypt_create_iv(32, MCRYPT_DEV_URANDOM));
                 $cryptHash = sha1($data["password"] . $salt);
 
                 $user->name = $data["name"];
@@ -112,7 +78,7 @@ class UserController extends \Library\Acl\ControllerBase
                 if ($user->save()) {
                     $this->flash->success("user was created successfully");
 
-                    return $this->response->redirect('user');
+                    return $this->response->redirect('/user');
                 }
                 foreach ($user->getMessages() as $message) {
                     $this->flash->error($message);
@@ -124,102 +90,133 @@ class UserController extends \Library\Acl\ControllerBase
     }
 
     /**
-     * Saves a user edited
+     * Edits a user
      *
+     * @AclName("APP ACL USER EDIT ACTION NAME")
+     * @AclDesc("APP ACL USER EDIT ACTION DESC")
      */
-    public function saveAction()
+    public function editAction($id)
     {
+        $user = \App\Models\User::findFirstById($id);
 
-        if (!$this->request->isPost()) {
-            return $this->dispatcher->forward(array(
-                "controller" => "user",
-                "action" => "index"
-            ));
-        }
+        $form = new App\Forms\User\Manage($user);
+        $request = $this->request;
 
-        $id = $this->request->getPost("id");
+        if ($request->isPost()) {
+            $data = $request->getPost();
 
-        $user = User::findFirstByid($id);
-        if (!$user) {
-            $this->flash->error("user does not exist " . $id);
+            if ($form->isValid($data)) {
+                $user->name = $data["name"];
+                $user->email = $data["email"];
+                $user->role = $data["role"];
+                $user->phone = $data["phone"];
 
-            return $this->dispatcher->forward(array(
-                "controller" => "user",
-                "action" => "index"
-            ));
-        }
+                if ($user->save()) {
+                    $this->flash->success("user was edited successfully");
 
-        $user->name = $this->request->getPost("name");
-        $user->email = $this->request->getPost("email", "email");
-        $user->role = $this->request->getPost("role");
-        $user->phone = $this->request->getPost("phone");
-        $user->crypt_hash = $this->request->getPost("crypt_hash");
-        $user->picture = $this->request->getPost("picture");
-        $user->password_salt = $this->request->getPost("password_salt");
-        $user->active = $this->request->getPost("active");
-        $user->forgot_password_hash = $this->request->getPost("forgot_password_hash");
-        $user->created_at = $this->request->getPost("created_at");
-        $user->updated_at = $this->request->getPost("updated_at");
-
-
-        if (!$user->save()) {
-
-            foreach ($user->getMessages() as $message) {
-                $this->flash->error($message);
+                    return $this->response->redirect('/user');
+                }
+                foreach ($user->getMessages() as $message) {
+                    $this->flash->error($message);
+                }
             }
-
-            return $this->dispatcher->forward(array(
-                "controller" => "user",
-                "action" => "edit",
-                "params" => array($user->id)
-            ));
         }
 
-        $this->flash->success("user was updated successfully");
-
-        return $this->dispatcher->forward(array(
-            "controller" => "user",
-            "action" => "index"
-        ));
-
+        $this->view->form = $form;
     }
 
     /**
-     * Deletes a user
+     * Changes a user's password
      *
-     * @param string $id
+     * @AclName("APP ACL USER CHANGE PASSWORD ACTION NAME")
+     * @AclDesc("APP ACL USER CHANGE PASSWORD ACTION DESC")
      */
-    public function deleteAction($id)
+    public function changePasswordAction()
     {
+        $identity = $this->auth->getIdentity();
+        $user = \App\Models\User::findFirstById($identity['id']);
 
-        $user = User::findFirstByid($id);
-        if (!$user) {
-            $this->flash->error("user was not found");
+        $form = new App\Forms\User\ChangePassword($user);
+        $request = $this->request;
 
-            return $this->dispatcher->forward(array(
-                "controller" => "user",
-                "action" => "index"
-            ));
+        if ($request->isPost()) {
+            $data = $request->getPost();
+
+            if ($form->isValid($data)) {
+                $salt = md5(mcrypt_create_iv(32, MCRYPT_DEV_URANDOM));
+                $cryptHash = sha1($data["password"] . $salt);
+
+                $user->crypt_hash = $cryptHash;
+                $user->password_salt = $salt;
+
+                if ($user->save()) {
+                    $this->flash->success("user was edited successfully");
+
+                    return $this->response->redirect('/user');
+                }
+                foreach ($user->getMessages() as $message) {
+                    $this->flash->error($message);
+                }
+            }
         }
 
-        if (!$user->delete()) {
+        $this->view->form = $form;
+    }
 
+    /**
+     * Deactivate a user
+     *
+     * @AclName("APP ACL USER DEACTIVATE ACTION NAME")
+     * @AclDesc("APP ACL USER DEACTIVATE ACTION DESC")
+     */
+    public function deactivateAction($id)
+    {
+        $user = \App\Models\User::findFirstByid($id);
+        if (!$user) {
+            $this->flash->error($this->translate->_('USER DEACTIVATE NOT FOUND ERROR MESSAGE'));
+            return $this->response->redirect('/user');
+        }
+
+        $user->active = false;
+        if (!$user->save()) {
             foreach ($user->getMessages() as $message) {
                 $this->flash->error($message);
             }
 
-            return $this->dispatcher->forward(array(
-                "controller" => "user",
-                "action" => "search"
-            ));
+            return $this->response->redirect('/user');
         }
 
-        $this->flash->success("user was deleted successfully");
+        $this->flash->success($this->translate->_('USER DEACTIVATE SUCCESS MESSAGE'));
 
-        return $this->dispatcher->forward(array(
-            "controller" => "user",
-            "action" => "index"
-        ));
+        return $this->response->redirect('/user');
+    }
+
+    /**
+     * Reactivate a user
+     *
+     * @AclName("APP ACL USER REACTIVATE ACTION NAME")
+     * @AclDesc("APP ACL USER REACTIVATE ACTION DESC")
+     */
+    public function reactivateAction($id)
+    {
+        $user = \App\Models\User::findFirstByid($id);
+        if (!$user) {
+            $this->flash->error($this->translate->_('USER REACTIVATE NOT FOUND ERROR MESSAGE'));
+            return $this->response->redirect('/user');
+        }
+
+        $user->active = true;
+        if (!$user->save()) {
+            foreach ($user->getMessages() as $message) {
+                $this->flash->error($message);
+            }
+
+            return $this->response->redirect('/user');
+        }
+
+        $this->flash->success($this->translate->_('USER REACTIVATE SUCCESS MESSAGE'));
+
+        return $this->response->redirect('/user');
     }
 
 }

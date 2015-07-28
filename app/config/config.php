@@ -21,6 +21,8 @@ return new \Phalcon\Config(array(
         'cacheDir'       => APP_PATH . '/app/cache/',
         'formsDir'       => APP_PATH . '/app/forms/',
         'libraryDir'     => APP_PATH . '/library/',
-        'baseUri'        => '/',
+        'messagesDir'    => APP_PATH . '/app/messages/',
+        'baseUri'        => 'https://phalcon-proj-marcos-sandim.c9.io',
+        'menu'           => APP_PATH . '/app/config/menu.php',
     )
 ));

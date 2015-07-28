@@ -35,16 +35,16 @@ CREATE TABLE "resource" (
 
 CREATE TABLE "user_group" (
     id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT NOT NULL REFERENCES "user"(ID),
-    group_id BIGINT NOT NULL REFERENCES "group"(ID),
+    user_id BIGINT NOT NULL REFERENCES "user"(ID) ON DELETE CASCADE,
+    group_id BIGINT NOT NULL REFERENCES "group"(ID) ON DELETE CASCADE,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP
 );
 
 CREATE TABLE "group_resource" (
     id BIGSERIAL PRIMARY KEY,
-    group_id BIGINT NOT NULL REFERENCES "group"(ID),
-    resource_id BIGINT NOT NULL REFERENCES "resource"(ID),
+    group_id BIGINT NOT NULL REFERENCES "group"(ID) ON DELETE CASCADE,
+    resource_id BIGINT NOT NULL REFERENCES "resource"(ID) ON DELETE CASCADE,
     type VARCHAR(32) NOT NULL DEFAULT 'deny',
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP
