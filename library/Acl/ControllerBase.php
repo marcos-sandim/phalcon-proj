@@ -35,7 +35,7 @@ class ControllerBase extends Controller
                 $this->flash->notice('You don\'t have access to this module: ' . $controllerName . ':' . $actionName);
 
                 if ($this->acl->isAllowed($identity['id'], $controllerName, 'index')) {
-                    return $this->response->redirect("/$controllerName");
+                    return $this->response->redirect('/' . strtolower($controllerName));
                 } else {
                     return $this->response->redirect('/');
                 }

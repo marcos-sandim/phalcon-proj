@@ -22,7 +22,9 @@ return new \Phalcon\Config(array(
         'formsDir'       => APP_PATH . '/app/forms/',
         'libraryDir'     => APP_PATH . '/library/',
         'messagesDir'    => APP_PATH . '/app/messages/',
+        'aclDir'         => APP_PATH . '/app/acl/',
         'baseUri'        => 'https://phalcon-proj-marcos-sandim.c9.io',
         'menu'           => APP_PATH . '/app/config/menu.php',
+        'routes'         => APP_PATH . '/app/config/routes.php',
     )
 ));

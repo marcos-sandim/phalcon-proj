@@ -13,6 +13,7 @@ $loader->registerDirs(
     array(
         'App\Forms'     => $config->application->formsDir,
         'App\Models'    => $config->application->modelsDir,
+        'App\Acl'       => $config->application->aclDir,
         'Library'       => $config->application->libraryDir,
     )
 )

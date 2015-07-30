@@ -1,6 +1,12 @@
-.logo img.logo-lg {
+.logo .logo-lg {
     height: 40px;
+    margin-top: 5px;
 }
+
+.logo .logo-mini {
+    height: 35px;
+    margin-top: 7px;
+    margin-left: -11px !important;
 
 .no-padding {
     padding: 0 !important;

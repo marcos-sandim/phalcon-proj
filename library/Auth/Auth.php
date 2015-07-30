@@ -53,7 +53,7 @@ class Auth extends Component
         $this->session->set('auth-identity', array(
             'id' => $user->id,
             'name' => $user->name,
-            //'profile' => $user->profile->name
+            'user' => $user
         ));
         return true;
     }
@@ -238,6 +238,17 @@ class Auth extends Component
     {
         $identity = $this->session->get('auth-identity');
         return $identity['name'];
+    }
+
+    /**
+     * Returns the current user's role
+     *
+     * @return string
+     */
+    public function getRole()
+    {
+        $identity = $this->session->get('auth-identity');
+        return $identity['user']->role;
     }
 
     /**

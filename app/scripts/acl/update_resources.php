@@ -59,7 +59,7 @@ try {
                 && $methodsAnnotations[$method->name]->has('AclName')
                 && $methodsAnnotations[$method->name]->has('AclDesc')) {
 
-                $resourceName = $controllerName . ':' . str_replace('_', '', \Phalcon\Text::uncamelize(substr($method->name, 0, -6)));
+                $resourceName = $controllerName . ':' . str_replace('_', '-', \Phalcon\Text::uncamelize(substr($method->name, 0, -6)));
                 $controllers[$resourceName] = array(
                     'name' => $resourceName,
                     'display_name' => $methodsAnnotations[$method->name]->get('AclName')->getArgument(0),

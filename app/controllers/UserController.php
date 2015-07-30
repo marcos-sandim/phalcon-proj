@@ -21,7 +21,7 @@ class UserController extends \Library\Acl\ControllerBase
     public function indexAction()
     {
         //$this->persistent->parameters = null;
-        $this->view->page_title = $this->translate->_('USER LIST TITLE');
+        $this->view->page_title = 'USER LIST TITLE';
         $numberPage = $this->request->getQuery("page", "int");
         /*if ($this->request->isPost()) {
             $query = Criteria::fromInput($this->di, "User", $_POST);
@@ -36,7 +36,7 @@ class UserController extends \Library\Acl\ControllerBase
         $builder = $this->modelsManager->createBuilder()
                    ->columns(array('u.id', 'u.name', 'u.email', 'u.role', 'u.phone', 'u.active'))
                    ->from(array('u' => '\App\Models\User'))
-                   ->orderBy(array('u.active', 'u.name'));
+                   ->orderBy(array('u.active DESC', 'u.name'));
 
         $paginator = new Phalcon\Paginator\Adapter\QueryBuilder(array(
             "builder" => $builder,
@@ -57,6 +57,7 @@ class UserController extends \Library\Acl\ControllerBase
     {
         $form = new App\Forms\User\Manage();
         $request = $this->request;
+        $this->view->page_title = 'USER CREATE TITLE';
 
         if ($request->isPost()) {
             $data = $request->getPost();
@@ -98,9 +99,9 @@ class UserController extends \Library\Acl\ControllerBase
     public function editAction($id)
     {
         $user = \App\Models\User::findFirstById($id);
-
         $form = new App\Forms\User\Manage($user);
         $request = $this->request;
+        $this->view->page_title = 'USER EDIT TITLE';
 
         if ($request->isPost()) {
             $data = $request->getPost();
@@ -136,6 +137,7 @@ class UserController extends \Library\Acl\ControllerBase
         $identity = $this->auth->getIdentity();
         $user = \App\Models\User::findFirstById($identity['id']);
 
+        $this->view->page_title = 'USER CHANGE PASSWORD TITLE';
         $form = new App\Forms\User\ChangePassword($user);
         $request = $this->request;
 

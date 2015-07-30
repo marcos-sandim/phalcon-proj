@@ -12,7 +12,9 @@ use Phalcon\Db\Adapter\Pdo as DbPdo;
 use Phalcon\Mvc\View\Engine\Volt as VoltEngine;
 use Phalcon\Mvc\Model\Metadata\Memory as MetaDataAdapter;
 use Phalcon\Session\Adapter\Files as SessionAdapter;
-
+use Phalcon\Text;
+use Phalcon\Mvc\Dispatcher as MvcDispatcher;
+use Phalcon\Events\Manager as EventsManager;
 use Phalcon\Flash\Direct as Flash;
 
 /**
@@ -29,6 +31,66 @@ $di->set('url', function () use ($config) {
 
     return $url;
 }, true);
+
+/**
+* add routing capabilities
+*/
+$di->set('router', function () use($config) {
+    require $config->application->routes;
+    return $router;
+});
+
+$di->set('dispatcher', function () use($di) {
+    // Create an EventsManager
+    $eventsManager = new EventsManager();
+
+    $eventsManager->attach("dispatch:beforeException", function ($event, $dispatcher, $exception) {
+        // Handle 404 exceptions
+        if ($exception instanceof \Phalcon\Mvc\Dispatcher\Exception) {
+            $dispatcher->forward(array(
+                'controller' => 'error',
+                'action' => 'notFound'
+            ));
+            return false;
+        }
+
+        // Alternative way, controller or action doesn't exist
+        if ($event->getType() == 'beforeException') {
+            switch ($exception->getCode()) {
+                case \Phalcon\Dispatcher::EXCEPTION_HANDLER_NOT_FOUND:
+                case \Phalcon\Dispatcher::EXCEPTION_ACTION_NOT_FOUND:
+                    $dispatcher->forward(array(
+                        'controller' => 'error',
+                        'action' => 'notFound'
+                    ));
+                    return false;
+            }
+        }
+    });
+
+    $eventsManager->attach("dispatch:beforeDispatch", function ($event, $dispatcher) use($eventsManager) {
+        $className = ucfirst($dispatcher->getControllerName()) . 'Controller';
+        $methodName = $dispatcher->getActionName().'Action';
+        try {
+            $refMethod = (new \ReflectionClass($className))->getMethod($methodName);
+            if ($refMethod->name != $methodName) {
+                $e = new \Phalcon\Mvc\Dispatcher\Exception("Method {$methodName} does not exist, did ou mean {$refMethod->name}?");
+                $eventsManager->fire('dispatch:beforeException', $dispatcher, $e);
+            }
+        }
+        catch (\ReflectionException $e) {
+            $eventsManager->fire('dispatch:beforeException', $dispatcher, $e);
+        }
+    });
+    $dispatcher = new MvcDispatcher();
+    $router = $di->get('router');
+    $dispatcher->setEventsManager($eventsManager);
+    $dispatcher->setControllerName($router->getControllerName());
+    $dispatcher->setActionName($router->getActionName());
+    $dispatcher->setParams($router->getParams());
+
+    return $dispatcher;
+});
 
 /**
  * Setting up the view component
@@ -141,8 +203,8 @@ $di->set('auth', function () {
 /**
  * Custom ACL component
  */
-$di->set('acl', function() {
-    $acl = new \Library\Acl\Adapter(array());
+$di->set('acl', function() use($config) {
+    $acl = new \Library\Acl\Adapter(array('aclDir' => $config->application->aclDir));
     // Default action is deny access
     $acl->setDefaultAction(Phalcon\Acl::DENY);
     return $acl;

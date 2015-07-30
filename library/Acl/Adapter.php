@@ -333,42 +333,21 @@ class Adapter extends \Phalcon\Acl\Adapter implements \Phalcon\Acl\AdapterInterf
      *
      * @return bool
      */
-    public function isAllowed($role, $controllerName, $actionName)
+    public function isAllowed($role, $controllerName, $actionName, $parameters = null)
     {
-        /*$sql = implode(' ', array(
-            'SELECT allowed FROM', $this->options['accessList'], 'AS a',
-            // role_name in:
-            'WHERE roles_name IN (',
-                // given 'role'-parameter
-                'SELECT ? ',
-                // inherited role_names
-                'UNION SELECT roles_inherit FROM', $this->options['rolesInherits'], 'WHERE roles_name = ?',
-                // or 'any'
-                "UNION SELECT '*'",
-            ')',
-            // resources_name should be given one or 'any'
-            "AND resources_name IN (?, '*')",
-            // access_name should be given one or 'any'
-            "AND access_name IN (?, '*')",
-            // order be the sum of bools for 'literals' before 'any'
-            "ORDER BY (roles_name != '*')+(resources_name != '*')+(access_name != '*') DESC",
-            // get only one...
-            'LIMIT 1'
-        ));
-
-        // fetch one entry...
-        $allowed = $this->options['db']->fetchOne($sql, Db::FETCH_NUM, array($role, $role, $resource, $access));
-        if (is_array($allowed)) {
-            return (bool) $allowed[0];
-        }*/
-
         $resourceName = $actionName ? "$controllerName:$actionName" : $controllerName;
         $user = \App\Models\User::findFirstById($role);
         $resource = \App\Models\Resource::findFirstByName($resourceName);
 
+        $di = \Phalcon\DI::getDefault();
+        $router = $di->get('router');
+        if ($parameters === null) {
+            $parameters = $router->getParams();
+        }
+
         foreach ($user->Group as $group) {
             if ($group->is_admin) {
-                return true;
+                return $this->checkAssert($controllerName, $actionName, $parameters);
             }
 
             $groupResource = \App\Models\GroupResource::findFirst(array(
@@ -380,7 +359,7 @@ class Adapter extends \Phalcon\Acl\Adapter implements \Phalcon\Acl\AdapterInterf
             ));
 
             if ($groupResource && $groupResource->type == 'allow') {
-                return true;
+                return $this->checkAssert($controllerName, $actionName, $parameters);
             }
         }
 
@@ -389,6 +368,20 @@ class Adapter extends \Phalcon\Acl\Adapter implements \Phalcon\Acl\AdapterInterf
          */
 
         return $this->_defaultAccess;
+    }
+
+    protected function checkAssert($controllerName, $actionName, $parameters)
+    {
+        $assertClassName = '\\App\\Acl\\' . \Phalcon\Text::camelize($controllerName).'Assert';
+        //var_dump($controllerName, $actionName, $assertClassName, $parameters);
+        if (class_exists($assertClassName)) {
+            $assertClass = new $assertClassName();
+            $assertMethodName = lcfirst(\Phalcon\Text::camelize($actionName)).'Assert';
+            if (method_exists ($assertClass , $assertMethodName)) {
+                return $assertClass->$assertMethodName($parameters);
+            }
+        }
+        return true;
     }
 
     /**

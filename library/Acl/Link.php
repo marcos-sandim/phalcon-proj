@@ -9,14 +9,16 @@ class Link
         $acl = $di->get('acl');
         $auth = $di->get('auth');
         $router = $di->get('router');
+        $dispatcher = $di->get('dispatcher');
         $translate = $di->get('translate');
 
         if (array_key_exists('controller', $parameters)) {
             $controllerName = $parameters['controller'];
             $actionName = array_key_exists('action', $parameters) ? $parameters['action']  : null;
         } else {
-            $controllerName = $router->getControllerName();
-            $actionName = $router->getActionName();
+            $controllerName = strtolower($dispatcher->getControllerName());
+            $actionName = strtolower($dispatcher->getActionName());
+            //var_dump($paths, $dispatcher->getControllerName(), $router->getControllerName());
         }
         $alwaysShow = array_key_exists('show', $args) && $args['show'] ? true : false;
 
@@ -35,7 +37,7 @@ class Link
             $identity = $auth->getIdentity();
 
             // If there is no identity available
-            if (!is_array($identity) || !$acl->isAllowed($identity['id'], $controllerName, $actionName)) {
+            if (!is_array($identity) || !$acl->isAllowed($identity['id'], $controllerName, $actionName, $parameters)) {
                 $allowed = false;
             }
         }

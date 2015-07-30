@@ -22,7 +22,7 @@
         <!-- Navigation -->
         <header class="main-header">
             <!-- Logo -->
-            {{ link_to('/', '<span class="logo-mini">VGPG</span><img class="logo-lg" src="/img/logo_h.png" alt="VGPG"></img>', 'class': 'logo') }}
+            {{ link_to('/', '<img class="logo-mini" src="/img/logo.png" alt="VGPG"></img><img class="logo-lg" src="/img/logo_h.png" alt="VGPG"></img>', 'class': 'logo') }}
             <!-- Header Navbar: style can be found in header.less -->
             <nav class="navbar navbar-static-top" role="navigation">
                 <!-- Sidebar toggle button-->
@@ -45,7 +45,7 @@
                                 <li class="user-header">
                                     <img src="../../dist/img/user2-160x160.jpg" class="img-circle" alt="User Image" />
                                     <p>
-                                        Alexander Pierce - Web Developer
+                                        {{ auth.getName() ~ ( auth.getRole() ? ' - ' ~ auth.getRole() : '') }}
                                         <small>Member since Nov. 2012</small>
                                     </p>
                                 </li>
@@ -64,7 +64,7 @@
                                 <!-- Menu Footer-->
                                 <li class="user-footer">
                                     <div class="pull-left">
-                                        {{ acl_link(['controller': 'user', 'action': 'changepassword'], '<i class="fa fa-fw fa-key"></i> Change password', ['class': 'btn btn-default btn-flat']) }}
+                                        {{ acl_link(['controller': 'user', 'action': 'change-password'], '<i class="fa fa-fw fa-key"></i> Change password', ['class': 'btn btn-default btn-flat']) }}
                                     </div>
                                     <div class="pull-right">
                                         {{ acl_link(['controller': 'session', 'action': 'logout'], '<i class="fa fa-fw fa-power-off"></i> Log Out', ['class': 'btn btn-default btn-flat']) }}
@@ -85,10 +85,10 @@
             <section class="content-header">
                 <h1>
                     {% if page_title is defined %}
-                        {{ page_title }}
+                        {{ _(page_title) }}
                     {% endif %}
                     {% if page_subtitle is defined %}
-                        <small>{{ page_subtitle }}</small>
+                        <small>{{ _(page_subtitle) }}</small>
                     {% endif %}
                 </h1>
                 <!-- <ol class="breadcrumb">

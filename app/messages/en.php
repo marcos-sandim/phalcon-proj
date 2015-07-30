@@ -28,6 +28,7 @@ return array(
     'USER EDIT TITLE' => 'Edit user',
     'USER MANAGE FORM NAME LABEL' => 'Name',
     'USER MANAGE FORM EMAIL LABEL' => 'Email',
+    'USER MANAGE FORM ROLE LABEL' => 'Role',
     'USER MANAGE FORM PHONE LABEL' => 'Phone',
     'USER MANAGE FORM PASSWORD LABEL' => 'Password',
     'USER MANAGE FORM CONFIRM PASSWORD LABEL' => 'Confirm password',
@@ -41,4 +42,7 @@ return array(
     'USER LIST ACTIVE LABEL' => 'Active',
     'USER LIST INACTIVE LABEL' => 'Inactive',
     'USER LIST NO USERS MESSAGE' => 'No users',
+    'USER LIST EDIT ACTION LABEL' => 'Edit',
+    'USER LIST DEACTIVATE ACTION LABEL' => 'Deactivate',
+    'USER LIST REACTIVATE ACTION LABEL' => 'Reactivate',
 );
