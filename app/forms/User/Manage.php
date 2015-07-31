@@ -2,7 +2,7 @@
 namespace App\Forms\User;
 
 use \Phalcon\Forms\Element\Text;
-//use \Phalcon\Forms\Element\Select;
+use \Phalcon\Forms\Element\Select;
 use \Phalcon\Forms\Element\Password;
 use \Phalcon\Forms\Element\Submit;
 
@@ -40,22 +40,46 @@ class Manage extends \Library\Forms\Base
         $element->setLabel($this->translate->_('USER MANAGE FORM NAME LABEL'))
             ->setAttribute('class', 'form-control')
             ->setUserOption('decorator', new BootstrapDecorator(array('style' => BootstrapDecorator::VERTICAL)))
-            ->setDefault($this->_user ? $this->_user->name : null);
+            ->setDefault($this->_user ? $this->_user->name : null)
+            ->addValidators(array(
+                new PresenceOfValidador(array(
+                    'message' => 'FORM ERROR MESSAGE REQUIRED FIELD'
+                )),
+                new StringLengthValidador(array(
+                    'max' => 256,
+                    'messageMaximum' => $this->translate->_('FORM ERROR MESSAGE TOO LONG MESSAGE')
+                ))));
         $this->add($element);
 
         $element = new Text('email');
         $element->setLabel($this->translate->_('USER MANAGE FORM EMAIL LABEL'))
             ->setAttribute('class', 'form-control')
-            ->addValidator(new EmailValidator())
             ->setUserOption('decorator', new BootstrapDecorator(array('style' => BootstrapDecorator::VERTICAL)))
-            ->setDefault($this->_user ? $this->_user->email : null);
+            ->setDefault($this->_user ? $this->_user->email : null)
+            ->addValidators(array(
+                new PresenceOfValidador(array(
+                    'message' => 'FORM ERROR MESSAGE REQUIRED FIELD'
+                )),
+                new StringLengthValidador(array(
+                    'max' => 256,
+                    'messageMaximum' => $this->translate->_('FORM ERROR MESSAGE TOO LONG MESSAGE')
+                )),
+                new EmailValidator()));
         $this->add($element);
 
         $element = new Text('role');
         $element->setLabel($this->translate->_('USER MANAGE FORM ROLE LABEL'))
             ->setAttribute('class', 'form-control')
             ->setUserOption('decorator', new BootstrapDecorator(array('style' => BootstrapDecorator::VERTICAL)))
-            ->setDefault($this->_user ? $this->_user->role : null);
+            ->setDefault($this->_user ? $this->_user->role : null)
+            ->addValidators(array(
+                new PresenceOfValidador(array(
+                    'message' => 'FORM ERROR MESSAGE REQUIRED FIELD'
+                )),
+                new StringLengthValidador(array(
+                    'max' => 256,
+                    'messageMaximum' => $this->translate->_('FORM ERROR MESSAGE TOO LONG MESSAGE')
+                ))));
         $this->add($element);
 
         $element = new Text('phone');
@@ -97,12 +121,26 @@ class Manage extends \Library\Forms\Base
                 ->setUserOption('decorator', new BootstrapDecorator(array('style' => BootstrapDecorator::VERTICAL)));
             $this->add($element);
         }
-        /*$this->add(new Text('telephone'));
 
-        $this->add(new Select('telephoneType', array(
-            'H' => 'Home',
-            'C' => 'Cell'
-        )));*/
+        $currentGroups = array();
+        if ($this->_user) {
+            foreach ($this->_user->Group as $group) {
+                $currentGroups[] = $group->id;
+            }
+        }
+
+        $element = new Select('groups', \App\Models\Group::findByActive(true), array('using' => array('id', 'name'), 'name' => 'groups[]'));
+        $element->setLabel($this->translate->_('USER MANAGE FORM GROUPS LABEL'))
+            ->setAttribute('class', 'form-control select2')
+            ->setAttribute('multiple', 'multiple')
+            ->setAttribute('data-placeholder', $this->translate->_('USER MANAGE FORM GROUPS PLACEHOLDER'))
+            ->setUserOption('decorator', new BootstrapDecorator(array('style' => BootstrapDecorator::VERTICAL)))
+            ->setDefault($currentGroups)
+            ->addValidators(array(
+                new PresenceOfValidador(array(
+                    'message' => 'FORM ERROR MESSAGE REQUIRED FIELD'
+                ))));
+        $this->add($element);
 
          // Sign Up
         $element = new Submit('submit', array(
@@ -110,17 +148,5 @@ class Manage extends \Library\Forms\Base
         ));
         $element->setDefault($this->translate->_('USER MANAGE FORM SUBMIT BUTTON LABEL'));
         $this->add($element);
-    }
-
-     /**
-     * Prints messages for a specific element
-     */
-    public function messages($name)
-    {
-        if ($this->hasMessagesFor($name)) {
-            foreach ($this->getMessagesFor($name) as $message) {
-                $this->flash->error($message);
-            }
-        }
     }
 }

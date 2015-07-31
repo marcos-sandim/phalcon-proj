@@ -32,6 +32,12 @@ class Group extends \Library\Model\Base
      *
      * @var string
      */
+    public $active;
+
+    /**
+     *
+     * @var string
+     */
     public $created_at;
 
     /**
@@ -73,6 +79,13 @@ class Group extends \Library\Model\Base
     public static function find($parameters = null)
     {
         return parent::find($parameters);
+    }
+
+    public static function findIn(array $identifiers)
+    {
+        return self::query()
+            ->inWhere('id', $identifiers)
+            ->execute();
     }
 
     /**

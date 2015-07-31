@@ -339,6 +339,10 @@ class Adapter extends \Phalcon\Acl\Adapter implements \Phalcon\Acl\AdapterInterf
         $user = \App\Models\User::findFirstById($role);
         $resource = \App\Models\Resource::findFirstByName($resourceName);
 
+        if (!$user || !$resource) {
+            return $this->_defaultAccess;
+        }
+
         $di = \Phalcon\DI::getDefault();
         $router = $di->get('router');
         if ($parameters === null) {

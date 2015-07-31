@@ -8,7 +8,6 @@ class Link
         $di = \Phalcon\DI::getDefault();
         $acl = $di->get('acl');
         $auth = $di->get('auth');
-        $router = $di->get('router');
         $dispatcher = $di->get('dispatcher');
         $translate = $di->get('translate');
 
@@ -18,7 +17,8 @@ class Link
         } else {
             $controllerName = strtolower($dispatcher->getControllerName());
             $actionName = strtolower($dispatcher->getActionName());
-            //var_dump($paths, $dispatcher->getControllerName(), $router->getControllerName());
+            $controllerName = strtolower(str_replace('_', '-', \Phalcon\Text::uncamelize($controllerName)));
+            $actionName = strtolower(str_replace('_', '-', \Phalcon\Text::uncamelize($actionName)));
         }
         $alwaysShow = array_key_exists('show', $args) && $args['show'] ? true : false;
 
@@ -32,7 +32,6 @@ class Link
 
         // Only check permissions on private controllers
         if ($acl->isPrivate($controllerName)) {
-
             // Get the current identity
             $identity = $auth->getIdentity();
 

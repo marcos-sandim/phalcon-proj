@@ -15,7 +15,7 @@ use Phalcon\Session\Adapter\Files as SessionAdapter;
 use Phalcon\Text;
 use Phalcon\Mvc\Dispatcher as MvcDispatcher;
 use Phalcon\Events\Manager as EventsManager;
-use Phalcon\Flash\Direct as Flash;
+use Phalcon\Flash\Session as Flash;
 
 /**
  * The FactoryDefault Dependency Injector automatically register the right services providing a full stack framework
@@ -49,13 +49,13 @@ $di->set('dispatcher', function () use($di) {
         if ($exception instanceof \Phalcon\Mvc\Dispatcher\Exception) {
             $dispatcher->forward(array(
                 'controller' => 'error',
-                'action' => 'notFound'
+                'action' => 'not-found'
             ));
             return false;
         }
 
         // Alternative way, controller or action doesn't exist
-        if ($event->getType() == 'beforeException') {
+        /*if ($event->getType() == 'beforeException') {
             switch ($exception->getCode()) {
                 case \Phalcon\Dispatcher::EXCEPTION_HANDLER_NOT_FOUND:
                 case \Phalcon\Dispatcher::EXCEPTION_ACTION_NOT_FOUND:
@@ -65,7 +65,7 @@ $di->set('dispatcher', function () use($di) {
                     ));
                     return false;
             }
-        }
+        }*/
     });
 
     $eventsManager->attach("dispatch:beforeDispatch", function ($event, $dispatcher) use($eventsManager) {
@@ -137,6 +137,12 @@ $di->setShared('view', function () use ($config) {
                 ->addFunction('floor', 'floor')
                 ->addFilter('int', function ($resolvedArgs, $exprArgs) {
                     return 'intval(' . $resolvedArgs . ')';
+                })
+                ->addFunction('start_js_buff', function($resolvedArgs, $exprArgs) {
+                    return 'ob_start()';
+                })
+                ->addFunction('end_js_buff', function($resolvedArgs, $exprArgs) {
+                    return '$this->assets->addInlineJs(preg_replace(\'/(<script.*?>)(.*)(<\/script>)/ims\', \'${2}\', ob_get_clean()))';
                 });
 
             return $volt;

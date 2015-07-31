@@ -117,7 +117,7 @@ class User extends \Library\Model\Base
 //        $this->hasMany('id', 'TranslationLanguageUser', 'user_id', array('alias' => 'TranslationLanguageUser'));
 //        $this->hasMany('id', 'TranslationValue', 'translator_id', array('alias' => 'TranslationValue'));
 //        $this->hasMany('id', 'TranslationValue', 'approved_by_id', array('alias' => 'TranslationValue'));
-//        $this->hasMany('id', 'UserGroup', 'user_id', array('alias' => 'UserGroup'));
+        $this->hasMany('id', '\App\Models\UserGroup', 'user_id', array('alias' => 'UserGroup'));
         $this->hasManyToMany('id', '\App\Models\UserGroup', 'user_id', 'group_id', '\App\Models\Group','id', array('alias' => 'Group'));
     }
 
@@ -153,4 +153,31 @@ class User extends \Library\Model\Base
         return parent::findFirst($parameters);
     }
 
+    public function setGroups($groups)
+    {
+        $currentGroups = array();
+        $newGroups = array();
+
+        foreach ($this->UserGroup as $userGroup) {
+            $currentGroups[$userGroup->group_id] = $userGroup;
+        }
+
+        foreach ($groups as $group) {
+            $newGroups[$group->id] = $group;
+        }
+
+        $toAdd = array_diff_key($newGroups, $currentGroups);
+        $toRem = array_diff_key($currentGroups, $newGroups);
+
+        foreach ($toAdd as $group) {
+            $userGroup = new UserGroup();
+            $userGroup->user_id = $this->id;
+            $userGroup->group_id = $group->id;
+            $userGroup->save();
+        }
+
+        foreach ($toRem as $userGroup) {
+            $userGroup->delete();
+        }
+    }
 }

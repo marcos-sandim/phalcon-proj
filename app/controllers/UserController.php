@@ -34,7 +34,6 @@ class UserController extends \Library\Acl\ControllerBase
         }*/
 
         $builder = $this->modelsManager->createBuilder()
-                   ->columns(array('u.id', 'u.name', 'u.email', 'u.role', 'u.phone', 'u.active'))
                    ->from(array('u' => '\App\Models\User'))
                    ->orderBy(array('u.active DESC', 'u.name'));
 
@@ -76,8 +75,11 @@ class UserController extends \Library\Acl\ControllerBase
                 $user->password_salt = $salt;
                 $user->active = true;
 
+                $groups = \App\Models\Group::findIn($data['groups']);
+                $user->setGroups($groups);
+
                 if ($user->save()) {
-                    $this->flash->success("user was created successfully");
+                    $this->flash->success($this->translate->_('USER CREATE SUCCESS MESSAGE'));
 
                     return $this->response->redirect('/user');
                 }
@@ -104,16 +106,19 @@ class UserController extends \Library\Acl\ControllerBase
         $this->view->page_title = 'USER EDIT TITLE';
 
         if ($request->isPost()) {
+            $form->get('groups')->setDefault(null);
             $data = $request->getPost();
-
             if ($form->isValid($data)) {
-                $user->name = $data["name"];
-                $user->email = $data["email"];
-                $user->role = $data["role"];
-                $user->phone = $data["phone"];
+                $user->name = $data['name'];
+                $user->email = $data['email'];
+                $user->role = $data['role'];
+                $user->phone = $data['phone'];
+
+                $groups = \App\Models\Group::findIn($data['groups']);
+                $user->setGroups($groups);
 
                 if ($user->save()) {
-                    $this->flash->success("user was edited successfully");
+                    $this->flash->success($this->translate->_('USER EDIT SUCCESS MESSAGE'));
 
                     return $this->response->redirect('/user');
                 }
@@ -152,7 +157,7 @@ class UserController extends \Library\Acl\ControllerBase
                 $user->password_salt = $salt;
 
                 if ($user->save()) {
-                    $this->flash->success("user was edited successfully");
+                    $this->flash->success($this->translate->_('USER PASSWORD CHANGE SUCCESS MESSAGE'));
 
                     return $this->response->redirect('/user');
                 }
@@ -174,10 +179,6 @@ class UserController extends \Library\Acl\ControllerBase
     public function deactivateAction($id)
     {
         $user = \App\Models\User::findFirstByid($id);
-        if (!$user) {
-            $this->flash->error($this->translate->_('USER DEACTIVATE NOT FOUND ERROR MESSAGE'));
-            return $this->response->redirect('/user');
-        }
 
         $user->active = false;
         if (!$user->save()) {
@@ -202,10 +203,6 @@ class UserController extends \Library\Acl\ControllerBase
     public function reactivateAction($id)
     {
         $user = \App\Models\User::findFirstByid($id);
-        if (!$user) {
-            $this->flash->error($this->translate->_('USER REACTIVATE NOT FOUND ERROR MESSAGE'));
-            return $this->response->redirect('/user');
-        }
 
         $user->active = true;
         if (!$user->save()) {

@@ -1,5 +1,3 @@
-{{ content() }}
-
 <?php echo $this->tag->form(array("user/search", "autocomplete" => "off")) ?>
 
 <div align="center">

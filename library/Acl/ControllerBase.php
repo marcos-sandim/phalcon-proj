@@ -17,22 +17,27 @@ class ControllerBase extends Controller
     {
         $controllerName = $dispatcher->getControllerName();
         $actionName = $dispatcher->getActionName();
+        $controllerName = strtolower(str_replace('_', '-', \Phalcon\Text::uncamelize($controllerName)));
+        $actionName = strtolower(str_replace('_', '-', \Phalcon\Text::uncamelize($actionName)));
 
         // Only check permissions on private controllers
         if ($this->acl->isPrivate($controllerName) || $this->acl->isPrivate("$controllerName:$actionName")) {
             // Get the current identity
-
             $identity = $this->auth->getIdentity();
+
+            $di = \Phalcon\DI::getDefault();
+            $translate = $di->get('translate');
+
             // If there is no identity available the user is redirected to index/index
             if (!is_array($identity)) {
-                //$this->flash->notice('You don\'t have access to this module: private');
+                $this->flash->error($translate->_('ACL ACCESS DENIED MESSAGE'));
 
                 return $this->response->redirect('/');
             }
 
             if (!$this->acl->isAllowed($identity['id'], $controllerName, $actionName)) {
 
-                $this->flash->notice('You don\'t have access to this module: ' . $controllerName . ':' . $actionName);
+                $this->flash->error($translate->_('ACL ACCESS DENIED MESSAGE'));
 
                 if ($this->acl->isAllowed($identity['id'], $controllerName, 'index')) {
                     return $this->response->redirect('/' . strtolower($controllerName));
