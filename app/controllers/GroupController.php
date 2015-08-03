@@ -118,10 +118,6 @@ class GroupController extends \Library\Acl\ControllerBase
     public function deactivateAction($id)
     {
         $group = \App\Models\Group::findFirstByid($id);
-        if (!$group) {
-            $this->flash->error($this->translate->_('GROUP DEACTIVATE NOT FOUND ERROR MESSAGE'));
-            return $this->response->redirect('/group');
-        }
 
         $group->active = false;
         if (!$group->save()) {
@@ -146,10 +142,6 @@ class GroupController extends \Library\Acl\ControllerBase
     public function reactivateAction($id)
     {
         $group = \App\Models\Group::findFirstByid($id);
-        if (!$group) {
-            $this->flash->error($this->translate->_('GROUP REACTIVATE NOT FOUND ERROR MESSAGE'));
-            return $this->response->redirect('/group');
-        }
 
         $group->active = true;
         if (!$group->save()) {
@@ -165,4 +157,40 @@ class GroupController extends \Library\Acl\ControllerBase
         return $this->response->redirect('/group');
     }
 
+    /**
+     * Reactivate a group
+     *
+     * @AclName("APP ACL GROUP MANAGE ACCESS ACTION NAME")
+     * @AclDesc("APP ACL GROUP MANAGE ACCESS ACTION DESC")
+     */
+    public function manageAccessAction($id)
+    {
+        $request = $this->request;
+
+        $group = \App\Models\Group::findFirstByid($id);
+        $form = new App\Forms\Group\ManageAccess($group);
+
+        $this->view->page_title = 'GROUP MANAGE ACCESS TITLE';
+        $this->view->page_subtitle = $group->name;
+
+        if ($request->isPost()) {
+            $data = $request->getPost();
+
+            if ($form->isValid($data)) {
+                /*$group->name = $data['name'];
+                $group->is_admin = array_key_exists('is_admin', $data) && $data['is_admin'];
+
+                if ($group->save()) {
+                    $this->flash->success("group was edited successfully");
+
+                    return $this->response->redirect('/group');
+                }
+                foreach ($group->getMessages() as $message) {
+                    $this->flash->error($message);
+                }*/
+            }
+        }
+
+        $this->view->form = $form;
+    }
 }

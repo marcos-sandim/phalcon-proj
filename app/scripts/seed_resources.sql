@@ -24,4 +24,4 @@ VALUES
 /*
 INSERT INTO "group_resource" (group_id, resource_id, type)
 VALUES
-(2, 6, 'allow');*/
+(2, 6, true);*/

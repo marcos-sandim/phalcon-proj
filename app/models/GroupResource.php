@@ -24,9 +24,9 @@ class GroupResource extends \Library\Model\Base
 
     /**
      *
-     * @var string
+     * @var boolean
      */
-    public $type;
+    public $allow;
 
     /**
      *

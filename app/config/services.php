@@ -49,7 +49,7 @@ $di->set('dispatcher', function () use($di) {
         if ($exception instanceof \Phalcon\Mvc\Dispatcher\Exception) {
             $dispatcher->forward(array(
                 'controller' => 'error',
-                'action' => 'not-found'
+                'action' => 'notFound'
             ));
             return false;
         }

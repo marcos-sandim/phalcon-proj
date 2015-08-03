@@ -39,6 +39,7 @@
                             </button>
                             <ul class="dropdown-menu pull-right" aria-labelledby="dLabel">
                                 <li>{{ acl_link(['controller': 'group', 'action': 'edit', group.id], '<i class="fa fa-pencil"></i> ' ~ _('GROUP LIST EDIT ACTION LABEL')) }}</li>
+                                <li>{{ acl_link(['controller': 'group', 'action': 'manage-access', group.id], '<i class="fa fa-lock"></i> ' ~ _('GROUP LIST MANAGE ACCESS ACTION LABEL')) }}</li>
                                 <li>{{ acl_link(['controller': 'group', 'action': 'deactivate', group.id], '<i class="fa fa-remove"></i> ' ~ _('GROUP LIST DEACTIVATE ACTION LABEL')) }}</li>
                                 <li>{{ acl_link(['controller': 'group', 'action': 'reactivate', group.id], '<i class="fa fa-check"></i> ' ~ _('GROUP LIST REACTIVATE ACTION LABEL')) }}</li>
                             </ul>

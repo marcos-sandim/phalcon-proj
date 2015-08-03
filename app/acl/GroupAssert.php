@@ -23,4 +23,11 @@ class GroupAssert
         $group = \App\Models\Group::findFirstById($groupId);
         return $group && !$group->active;
     }
+
+    public function manageAccessAssert($parameters)
+    {
+        $groupId = array_shift($parameters);
+        $group = \App\Models\Group::findFirstById($groupId);
+        return $group && !$group->is_admin;
+    }
 }

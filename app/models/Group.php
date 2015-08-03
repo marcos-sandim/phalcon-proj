@@ -53,11 +53,11 @@ class Group extends \Library\Model\Base
     {
         $this->setSchema("public");
         $this->setSchema("public");
-        $this->hasMany('id', 'CmsMenuItemGroup', 'group_id', array('alias' => 'CmsMenuItemGroup'));
-        $this->hasMany('id', 'CmsPageGroup', 'group_id', array('alias' => 'CmsPageGroup'));
-        $this->hasMany('id', 'GroupResource', 'group_id', array('alias' => 'GroupResource'));
-        $this->hasMany('id', 'TranslationLanguageGroup', 'group_id', array('alias' => 'TranslationLanguageGroup'));
-        $this->hasMany('id', 'UserGroup', 'group_id', array('alias' => 'UserGroup'));
+        //$this->hasMany('id', 'CmsMenuItemGroup', 'group_id', array('alias' => 'CmsMenuItemGroup'));
+        //$this->hasMany('id', 'CmsPageGroup', 'group_id', array('alias' => 'CmsPageGroup'));
+        //$this->hasMany('id', 'TranslationLanguageGroup', 'group_id', array('alias' => 'TranslationLanguageGroup'));
+        $this->hasMany('id', '\App\Models\GroupResource', 'group_id', array('alias' => 'GroupResource'));
+        $this->hasMany('id', '\App\Models\UserGroup', 'group_id', array('alias' => 'UserGroup'));
     }
 
     /**

@@ -46,7 +46,7 @@ CREATE TABLE "group_resource" (
     id BIGSERIAL PRIMARY KEY,
     group_id BIGINT NOT NULL REFERENCES "group"(ID) ON DELETE CASCADE,
     resource_id BIGINT NOT NULL REFERENCES "resource"(ID) ON DELETE CASCADE,
-    type VARCHAR(32) NOT NULL DEFAULT 'deny',
+    allow BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP
 );
